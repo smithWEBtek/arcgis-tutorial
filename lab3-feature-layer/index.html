@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>ArcGIS JavaScript Tutorials: Create a JavaScript starter app</title>
+    <style>
+      html, body, #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.11/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.11/"></script>
+    <script>
+      require([
+        "esri/Map",
+        "esri/views/MapView",
+        //*** ADD ***//
+        // "esri/widgets/BasemapToggle",
+        // "esri/widgets/BasemapGallery",
+        "esri/layers/FeatureLayer"
+      // ], function(Map, MapView, BasemapToggle, BasemapGallery, FeatureLayer) {
+      ], function(Map, MapView, FeatureLayer) {
+
+          var map = new Map({
+            basemap: "topo-vector"
+          });
+
+          var view = new MapView({
+            container: "viewDiv",
+            map: map,
+            center: [-118.71511,34.09042],// longitude, latitude
+            // center: [-71.5159015,42.9464737],// longitude, latitude
+            zoom: 11
+          });
+
+          // var basemapToggle = new BasemapToggle({
+          //   view: view,
+          //   nextBasemap: "satellite"
+          // });
+
+          // var basemapGallery = new BasemapGallery({
+          //   view: view,
+          //   source: {
+          //     portal: {
+          //       url: 'https://www.argis.com',
+          //       useVectorBasemaps: true // Load vector tile basemaps
+          //     }
+          //   }
+          // })
+
+        // Trails feature layer (lines)
+        var trailsLayer = new FeatureLayer({
+        url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trails/FeatureServer/0",
+        //*** ADD ***//
+        definitionExpression: "ELEV_GAIN < 250",
+
+        //*** ADD ***//
+        renderer: {
+          type: "simple",
+          symbol: {
+            type: "simple-line",
+            color: "green",
+            width: "3px"
+          }
+        },
+
+        //*** ADD ***//
+        outFields: ["TRL_NAME","ELEV_GAIN"],
+
+        //*** ADD ***//
+        popupTemplate: {  // Enable a popup
+          title: "{TRL_NAME}", // Show attribute value
+          content: "The trail elevation gain is {ELEV_GAIN} ft."  // Display text in pop-up
+        }
+      });
+
+          // view.ui.add(basemapToggle, "bottom-left");
+          map.add(trailsLayer);
+      // Parks and open spaces (polygons)
+      var parksLayer = new FeatureLayer({
+        url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Parks_and_Open_Space/FeatureServer/0"
+      });
+
+      map.add(parksLayer, 0);
+
+        });
+    </script>
+  </head>
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+
+</html>
